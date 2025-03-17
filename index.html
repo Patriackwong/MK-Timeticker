@@ -3,30 +3,30 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
+
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <!-- Google Fonts (Poppins and Roboto) -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    
+
     <style>
       body {
-        background-color: #A8E6CF; /* Green pastel background */
+        background-color: #A8E6CF;
         font-family: 'Poppins', sans-serif;
         color: #333;
       }
-      
+
       h1 {
         font-weight: 600;
         color: #4CAF50;
         margin-top: 30px;
       }
-      
+
       h2 {
         font-weight: 400;
         color: #E91E63;
       }
-      
+
       .btn {
         border-radius: 50px;
         padding: 15px 30px;
@@ -79,7 +79,7 @@
         background-color: #4CAF50;
         color: white;
       }
-      
+
       .card {
         border-radius: 10px;
         padding: 20px;
@@ -87,18 +87,45 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         margin: 10px;
       }
+
+      .logo {
+        max-width: 150px;
+        margin-bottom: 20px;
+      }
+
+      .pdpa-section {
+        margin-top: 20px;
+      }
     </style>
+
     <title>MK Time Ticker</title>
   </head>
   <body>
     <div class="container text-center">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTytwug670ZT-11TYlXrUSICFqRsBv5_WCqmQ&s" alt="Logo" class="logo">
+
       <h1>บันทึกเวลาการทำของพนักงานขับรถประจำคลังแม่กลอง</h1>
       <p>กดปุ่มด้านล่าง เพื่อบันทึกการลงเข้า </p>
-      <div id="cin" class="visible card"><button type="button" class="btn btn-success" onclick="getLocation()">Check-In</button></div>
+
+      <div id="cin" class="visible card">
+        <button type="button" class="btn btn-success" onclick="getLocation()">Check-In</button>
+      </div>
+
       <p>กดปุ่ม เพื่อบันทึกเวลาออก </p>
-      <div id="cout" class="visible card"><button type="button" class="btn btn-danger" onclick="getLocationOut()">Check-Out</button></div>
+      <div id="cout" class="visible card">
+        <button type="button" class="btn btn-danger" onclick="getLocationOut()">Check-Out</button>
+      </div>
+
       <h2><font color="red">เมื่อเลิกงานแล้วอย่าลืม Check-Out เพื่อสิทธิประโยชน์ของผู้ทำงานเอง</font></h2>
       <p id="demo"></p>
+
+      <!-- PDPA Section -->
+      <div class="pdpa-section">
+        <input type="checkbox" id="pdpaConsent" /> 
+        <label for="pdpaConsent">ฉันขออนุญาตให้เก็บข้อมูลตามข้อกำหนด PDPA</label>
+        <br>
+        <a href="https://patriackwong.github.io/PTGMKDEPOTPDPA/" target="_blank">รายละเอียดนโยบายความเป็นส่วนตัว (Privacy Notice)</a>
+      </div>
 
       <!-- Modal for loading status -->
       <div class="modal" tabindex="-1" role="dialog" id="loadingModal">
@@ -124,15 +151,15 @@
 
       function initializeLiff(myLiffId) {
         liff
-            .init({
-                liffId: myLiffId
-            })
-            .then(() => {
-                console.log('LIFF Initialized successfully');
-            })
-            .catch((err) => {
-                console.error('LIFF Initialization failed', err);
-            });
+          .init({
+            liffId: myLiffId
+          })
+          .then(() => {
+            console.log('LIFF Initialized successfully');
+          })
+          .catch((err) => {
+            console.error('LIFF Initialization failed', err);
+          });
       }
 
       var x = document.getElementById("demo");
@@ -150,25 +177,29 @@
       }
 
       function getLocation() {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(showPosition, handleError);
-        } else { 
-          x.innerHTML = "Geolocation is not supported by this browser.";
+        if (document.getElementById('pdpaConsent').checked) {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition, handleError);
+          } else {
+            x.innerHTML = "Geolocation is not supported by this browser.";
+          }
+        } else {
+          alert("กรุณายอมรับเงื่อนไข PDPA ก่อน");
         }
       }
 
       function showPosition(position) {
-        showLoading(); 
+        showLoading();
 
         liff.getProfile().then(function(profile) {
           var uid = profile.userId;
           var uname = profile.displayName;
           var xos = liff.getOS();
-          x.innerHTML = "Lat: " + position.coords.latitude + 
-                        "<br>Long: " + position.coords.longitude + 
-                        "<br>userId: " + uid + 
-                        "<br>displayName: " + uname +
-                        "<br>your OS: " + xos;
+          x.innerHTML = "Lat: " + position.coords.latitude +
+            "<br>Long: " + position.coords.longitude +
+            "<br>userId: " + uid +
+            "<br>displayName: " + uname +
+            "<br>your OS: " + xos;
 
           var xmlhttp = new XMLHttpRequest();
           var theUrl = xurl + "?ctype=In&xos=" + xos + "&user=" + uid + "&name=" + uname + "&lat=" + position.coords.latitude + "&long=" + position.coords.longitude;
@@ -178,17 +209,18 @@
           xmlhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
               var jsonResponse = JSON.parse(this.responseText);
-              alert(jsonResponse.desc); 
-              hideLoading(); 
+              alert(jsonResponse.desc);
+
+              hideLoading();
               liff.closeWindow();
             } else if (this.readyState == 4) {
               alert('Error: ' + this.status + ' - ' + this.statusText);
-              hideLoading(); 
+              hideLoading();
             }
           };
         }).catch((err) => {
           console.error("Error fetching LIFF profile:", err);
-          hideLoading(); 
+          hideLoading();
         });
       }
 
@@ -199,25 +231,29 @@
       }
 
       function getLocationOut() {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(showPositionOut, handleError);
-        } else { 
-          x.innerHTML = "Geolocation is not supported by this browser.";
+        if (document.getElementById('pdpaConsent').checked) {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPositionOut, handleError);
+          } else {
+            x.innerHTML = "Geolocation is not supported by this browser.";
+          }
+        } else {
+          alert("กรุณายอมรับเงื่อนไข PDPA ก่อน");
         }
       }
 
       function showPositionOut(position) {
-        showLoading(); 
+        showLoading();
 
         liff.getProfile().then(function(profile) {
           var uid = profile.userId;
           var uname = profile.displayName;
           var xos = liff.getOS();
-          x.innerHTML = "Lat: " + position.coords.latitude + 
-                        "<br>Long: " + position.coords.longitude + 
-                        "<br>userId: " + uid + 
-                        "<br>displayName: " + uname + 
-                        "<br>your OS: " + xos;
+          x.innerHTML = "Lat: " + position.coords.latitude +
+            "<br>Long: " + position.coords.longitude +
+            "<br>userId: " + uid +
+            "<br>displayName: " + uname +
+            "<br>your OS: " + xos;
 
           var xmlhttp = new XMLHttpRequest();
           var theUrl = xurl + "?ctype=Out&xos=" + xos + "&user=" + uid + "&name=" + uname + "&lat=" + position.coords.latitude + "&long=" + position.coords.longitude;
@@ -227,17 +263,18 @@
           xmlhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
               var jsonResponse = JSON.parse(this.responseText);
-              alert(jsonResponse.desc); 
-              hideLoading(); 
+              alert(jsonResponse.desc);
+
+              hideLoading();
               liff.closeWindow();
             } else if (this.readyState == 4) {
               alert('Error: ' + this.status + ' - ' + this.statusText);
-              hideLoading(); 
+              hideLoading();
             }
           };
         }).catch((err) => {
           console.error("Error fetching LIFF profile:", err);
-          hideLoading(); 
+          hideLoading();
         });
       }
     </script>
