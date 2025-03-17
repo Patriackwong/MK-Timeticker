@@ -79,7 +79,7 @@
         background-color: #4CAF50;
         color: white;
       }
-      
+
       .card {
         border-radius: 10px;
         padding: 20px;
@@ -87,16 +87,45 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         margin: 10px;
       }
+
+      #logo {
+        max-width: 200px;
+        margin-top: 20px;
+      }
+
+      .checkbox-label {
+        font-size: 14px;
+        color: #555;
+      }
     </style>
     <title>MK Time Ticker</title>
   </head>
   <body>
     <div class="container text-center">
+      <!-- PTG Energy Logo -->
+      <img id="logo" src="https://example.com/logo-ptg-energy.png" alt="PTG Energy Logo">
+
       <h1>บันทึกเวลาการทำของพนักงานขับรถประจำคลังแม่กลอง</h1>
       <p>กดปุ่มด้านล่าง เพื่อบันทึกการลงเข้า </p>
-      <div id="cin" class="visible card"><button type="button" class="btn btn-success" onclick="getLocation()">Check-In</button></div>
+      
+      <!-- PDPA Checkbox -->
+      <div>
+        <input type="checkbox" id="pdpaCheckbox" class="mr-2">
+        <label for="pdpaCheckbox" class="checkbox-label">ฉันขออนุญาตให้เก็บข้อมูลตามข้อกำหนด PDPA</label>
+      </div>
+      
+      <!-- Check-In Button -->
+      <div id="cin" class="visible card">
+        <button type="button" class="btn btn-success" onclick="getLocation()" disabled id="checkInBtn">Check-In</button>
+      </div>
+
       <p>กดปุ่ม เพื่อบันทึกเวลาออก </p>
-      <div id="cout" class="visible card"><button type="button" class="btn btn-danger" onclick="getLocationOut()">Check-Out</button></div>
+      
+      <!-- Check-Out Button -->
+      <div id="cout" class="visible card">
+        <button type="button" class="btn btn-danger" onclick="getLocationOut()" disabled id="checkOutBtn">Check-Out</button>
+      </div>
+
       <h2><font color="red">เมื่อเลิกงานแล้วอย่าลืม Check-Out เพื่อสิทธิประโยชน์ของผู้ทำงานเอง</font></h2>
       <p id="demo"></p>
 
@@ -136,6 +165,13 @@
       }
 
       var x = document.getElementById("demo");
+
+      // Enable buttons when PDPA is accepted
+      document.getElementById("pdpaCheckbox").addEventListener("change", function() {
+        const isChecked = this.checked;
+        document.getElementById("checkInBtn").disabled = !isChecked;
+        document.getElementById("checkOutBtn").disabled = !isChecked;
+      });
 
       function showLoading() {
         $('#loadingModal').modal({
